@@ -13,33 +13,141 @@
 
   <meta charset="UTF-8">
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1">
 
   <title>Almee Kuo — Portfolio</title>
   <link rel="icon" type="image/png" href="favicon.png">
 
   <style>
+    * { box-sizing: border-box; }
+
     html, body {
       margin: 0;
-      padding: 0;
       width: 100%;
-      height: 100%;
+      min-height: 100%;
     }
 
-    iframe {
+    /* Desktop */
+    #desktop-viewer {
       display: block;
       width: 100%;
       height: 100vh;
       height: 100dvh;
-      border: none;
+      border: 0;
+    }
+
+    /* Mobile */
+    #mobile-viewer {
+      display: none;
+      width: 100%;
+      padding: 8px;
+      background: #e9ecef;
+    }
+
+    .pdf-page {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 8px;
+      background: white;
+    }
+
+    #status {
+      text-align: center;
+      padding: 24px;
+      font: 14px Arial, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      #desktop-viewer { display: none; }
+      #mobile-viewer { display: block; }
     }
   </style>
 </head>
 
 <body>
+  <!-- Desktop: original PDF -->
   <iframe
-    src="Portfolio_Almee_Kuo_2026.pdf#view=FitH"
+    id="desktop-viewer"
+    src="Portfolio_Almee_Kuo_2026.pdf"
     title="Almee Kuo Portfolio">
   </iframe>
+
+  <!-- Mobile: responsive PDF -->
+  <main id="mobile-viewer">
+    <div id="status">Loading portfolio...</div>
+    <div id="pdf-pages"></div>
+  </main>
+
+  <script type="module">
+    if (window.matchMedia("(max-width: 768px)").matches) {
+      const pdfjsLib = await import(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
+      );
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+
+      const container = document.getElementById("pdf-pages");
+      const status = document.getElementById("status");
+
+      try {
+        const pdf = await pdfjsLib.getDocument(
+          "Portfolio_Almee_Kuo_2026.pdf"
+        ).promise;
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+
+          const base = page.getViewport({ scale: 1 });
+          const availableWidth =
+            container.clientWidth || window.innerWidth - 16;
+
+          const scale = availableWidth / base.width;
+          const viewport = page.getViewport({ scale });
+
+          const pixelRatio = Math.min(
+            window.devicePixelRatio || 1, 2
+          );
+
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+
+          canvas.className = "pdf-page";
+          canvas.width = Math.floor(
+            viewport.width * pixelRatio
+          );
+          canvas.height = Math.floor(
+            viewport.height * pixelRatio
+          );
+
+          canvas.style.width = viewport.width + "px";
+          canvas.style.height = viewport.height + "px";
+
+          container.appendChild(canvas);
+
+          await page.render({
+            canvasContext: context,
+            viewport,
+            transform: [
+              pixelRatio, 0, 0, pixelRatio, 0, 0
+            ]
+          }).promise;
+
+          status.textContent =
+            `Loading ${i} / ${pdf.numPages}...`;
+        }
+
+        status.remove();
+
+      } catch (error) {
+        console.error(error);
+        status.innerHTML =
+          'Unable to load portfolio. ' +
+          '<a href="Portfolio_Almee_Kuo_2026.pdf">' +
+          'Open PDF directly</a>';
+      }
+    }
+  </script>
 </body>
 </html>
