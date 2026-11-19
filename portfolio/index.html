@@ -12,10 +12,9 @@
   </script>
 
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Almee Kuo — Portfolio</title>
+  <title>Almee Kuo — Senior Product Designer Portfolio</title>
   <link rel="icon" type="image/png" href="favicon.png">
 
   <style>
@@ -69,7 +68,7 @@
   <!-- Desktop: original PDF -->
   <iframe
     id="desktop-viewer"
-    src="Portfolio_Almee_Kuo_2026.pdf"
+    src="AlmeeKuo_SrProductDesigner_Portfolio_2026.pdf"
     title="Almee Kuo Portfolio">
   </iframe>
 
@@ -93,7 +92,7 @@
 
       try {
         const pdf = await pdfjsLib.getDocument(
-          "Portfolio_Almee_Kuo_2026.pdf"
+          "AlmeeKuo_SrProductDesigner_Portfolio_2026.pdf"
         ).promise;
 
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -144,7 +143,7 @@
         console.error(error);
         status.innerHTML =
           'Unable to load portfolio. ' +
-          '<a href="Portfolio_Almee_Kuo_2026.pdf">' +
+          '<a href="AlmeeKuo_SrProductDesigner_Portfolio_2026.pdf">' +
           'Open PDF directly</a>';
       }
     }
